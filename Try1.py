@@ -1,6 +1,7 @@
 import cv2 as cv
 import mediapipe as mp
 import numpy as np
+import keyboard
 
 rep = 0
 def angle_calculate(a,b,c):
@@ -59,8 +60,8 @@ def game_controller(angle):
         stage = 1
         rep +=1
         print(rep)
-     
-       
+        keyboard.write(" ")
+             
 def main():
     #setup mediapie
     mp_drawing = mp.solutions.drawing_utils
