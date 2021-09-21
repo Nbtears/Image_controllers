@@ -36,12 +36,22 @@ def image_process (frame,mp_drawing,mp_holistic,holistic):
                   landmarks[mp_holistic.PoseLandmark.LEFT_WRIST.value].y]
         
         angle = angle_calculate(shoulder_L,elbow_L,wrist_L)
+        
         #look angle
         cv.putText(image,str(angle),
                    tuple(np.multiply(elbow_L,[647,510]).astype(int)),
                          cv.FONT_HERSHEY_SIMPLEX,0.5,(255,255,255),2,cv.LINE_AA)
+        
+        #etiquetas
+        cv.rectangle(image,(0,0),(180,50),(219,191,255),-1)
+        cv.rectangle(image,(430,0),(800,50),(219,191,255),-1)
+        
+        cv.putText(image,"V. Angular = ",
+                   (10,30),cv.FONT_HERSHEY_SIMPLEX,0.6,(0,0,0),2,cv.LINE_AA)
+        cv.putText(image,"A. Angular = ",
+                   (450,30),cv.FONT_HERSHEY_SIMPLEX,0.6,(0,0,0),2,cv.LINE_AA)
+        
         game_controller(angle)
-          
     except:
         pass
      #dibujar las articulaciones del cuerpo en la imagen
@@ -53,14 +63,17 @@ def image_process (frame,mp_drawing,mp_holistic,holistic):
 
 def game_controller(angle):
     global stage, rep
+    
     if angle > 110:
         stage = 0
+        
+    #if angle > 60 and angle < 100:
+        
     if angle < 60 and stage==0:
-        print("hi")
         stage = 1
         rep +=1
         print(rep)
-        keyboard.write(" ")
+        keyboard.write("w")
              
 def main():
     #setup mediapie
@@ -68,6 +81,7 @@ def main():
     mp_holistic = mp.solutions.holistic               
     #Abrir cámara web 
     capture = cv.VideoCapture(0) 
+    
     with mp_holistic.Holistic(min_detection_confidence=0.8,min_tracking_confidence=0.8)as holistic:
         while True:
             #Lerr datos de camara web
