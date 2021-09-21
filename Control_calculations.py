@@ -2,6 +2,7 @@ import cv2 as cv
 import mediapipe as mp
 import numpy as np
 import keyboard
+import time
 
 rep = 0
 def angle_calculate(a,b,c):
@@ -14,10 +15,10 @@ def angle_calculate(a,b,c):
     
     if angle > 180.0:
         angle=360-angle
-    
+        
     return angle 
 
-def image_process (frame,mp_drawing,mp_holistic,holistic):  
+def image_process (frame,mp_drawing,mp_holistic,holistic,ai,ti,vi):  
     global angle
     #cambios de color y aplicar módulo holistic
     image= cv.cvtColor(frame,cv.COLOR_RGB2BGR)
@@ -52,6 +53,9 @@ def image_process (frame,mp_drawing,mp_holistic,holistic):
                    (450,30),cv.FONT_HERSHEY_SIMPLEX,0.6,(0,0,0),2,cv.LINE_AA)
         
         game_controller(angle)
+        
+        ai,ti,vi=va_angular(angle,ai,ti,vi)
+        
     except:
         pass
      #dibujar las articulaciones del cuerpo en la imagen
@@ -74,11 +78,37 @@ def game_controller(angle):
         rep +=1
         print(rep)
         keyboard.write("w")
+        
+def va_angular(angle,ai=None,ti=None,vi=None):
+    global v,w
+    tf=1
+    if ai==None:
+        ai= angle
+        ti=tf
+        vi=(angle-angle)/(tf-tf)
+        
+    else:
+        v=(angle-ai)/(tf-ti)
+        w=(v-vi)/tf
+        ai=angle
+        ti=tf
+        vi=v
+        print(w)
+        print(v)
+        
+    return ai,ti,vi
              
 def main():
+    
+    #Definicion de variables
+    ai=None
+    ti=None
+    vi=None
+    
     #setup mediapie
     mp_drawing = mp.solutions.drawing_utils
-    mp_holistic = mp.solutions.holistic               
+    mp_holistic = mp.solutions.holistic 
+              
     #Abrir cámara web 
     capture = cv.VideoCapture(0) 
     
@@ -87,8 +117,9 @@ def main():
             #Lerr datos de camara web
             data,frame = capture.read()
             frame = cv.flip(frame,1)
-            image= image_process(frame,mp_drawing,mp_holistic,holistic)
-            
+            image= image_process(frame,mp_drawing,mp_holistic,holistic,ai,ti,vi)
+            t=time.clock()
+            print(t)
             cv.imshow('camera',image)
             
             if cv.waitKey(1) == ord('q'):

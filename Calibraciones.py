@@ -14,6 +14,7 @@ def Regression_calculation(y_true,y_pred):
     print("Coeficiente de x: ", model.coef_)
     print("Intercepto: ", model.intercept_)
     
+    return model.coef_,model.intercept_
 
 def angle_calculate(a,b,c):
     a=np.array(a)
@@ -26,7 +27,7 @@ def angle_calculate(a,b,c):
     if angle > 180.0:
         angle=360-angle
     
-    return int(angle)  
+    return int(angle)   
 
 def image_process (frame,mp_drawing,mp_holistic,holistic):  
     angle = 0
@@ -45,14 +46,6 @@ def image_process (frame,mp_drawing,mp_holistic,holistic):
                   landmarks[mp_holistic.PoseLandmark.LEFT_ELBOW.value].y]
         wrist_L = [landmarks[mp_holistic.PoseLandmark.LEFT_WRIST.value].x,
                   landmarks[mp_holistic.PoseLandmark.LEFT_WRIST.value].y]
-        
-        #coordenadas de brazo der
-        shoulder_R = [landmarks[mp_holistic.PoseLandmark.RIGHT_SHOULDER.value].x,
-                  landmarks[mp_holistic.PoseLandmark.RIGHT_SHOULDER.value].y]
-        elbow_R = [landmarks[mp_holistic.PoseLandmark.RIGHT_ELBOW.value].x,
-                  landmarks[mp_holistic.PoseLandmark.RIGHT_ELBOW.value].y]
-        wrist_R = [landmarks[mp_holistic.PoseLandmark.RIGHT_WRIST.value].x,
-                  landmarks[mp_holistic.PoseLandmark.RIGHT_WRIST.value].y]
         
        
         angle = angle_calculate(shoulder_L,elbow_L,wrist_L)
@@ -83,7 +76,8 @@ def Mistake_calculation(y_true,y_pred):
     plt.ylabel('Predicted angle')
     plt.xlabel('Actual angle')
     plt.text(30,100,"RMSE = "+str(f"{mse:.2f}"),fontsize=18)
-    plt.show  
+    plt.show
+    
     
 def main(): 
     
@@ -128,7 +122,9 @@ def main():
     cv.destroyAllWindows()
     capture.release()  
     Mistake_calculation(y_true, y_pred)
-    Regression_calculation(y_true, y_pred)
+    x,y=Regression_calculation(y_true, y_pred)
+    
+    return x,y
 
 if __name__=="__main__":
     main()          
