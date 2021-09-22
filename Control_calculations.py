@@ -5,7 +5,7 @@ import keyboard
 import time
 
 rep = 0
-def angle_calculate(a,b,c):
+def angle_calculate(a,b,c,first = None,vi = None,ti = None,):
     a=np.array(a)
     b=np.array(b)
     c=np.array(c)
@@ -15,10 +15,25 @@ def angle_calculate(a,b,c):
     
     if angle > 180.0:
         angle=360-angle
-        
-    return angle 
 
-def image_process (frame,mp_drawing,mp_holistic,holistic,ai,ti,vi):  
+    tf=time.perf_counter()
+
+    if first==None:
+        first = float(angle)
+        ti=tf
+        vi=0
+        v=0
+        w=0
+
+    else:
+        v= (angle-first)/(tf-ti)
+        w=(v-vi)/tf
+        first=angle
+        ti=tf
+        vi=v
+    return angle,first,vi,ti,v,w
+
+def image_process (frame,mp_drawing,mp_holistic,holistic, first = None,vi = None,ti = None):  
     global angle
     #cambios de color y aplicar módulo holistic
     image= cv.cvtColor(frame,cv.COLOR_RGB2BGR)
@@ -36,26 +51,24 @@ def image_process (frame,mp_drawing,mp_holistic,holistic,ai,ti,vi):
         wrist_L = [landmarks[mp_holistic.PoseLandmark.LEFT_WRIST.value].x,
                   landmarks[mp_holistic.PoseLandmark.LEFT_WRIST.value].y]
         
-        angle = angle_calculate(shoulder_L,elbow_L,wrist_L)
+        angle,first,vi,ti,v,w = angle_calculate(shoulder_L,elbow_L,wrist_L,first,vi,ti)
         
         #look angle
-        cv.putText(image,str(angle),
+        cv.putText(image,str(int(angle)),
                    tuple(np.multiply(elbow_L,[647,510]).astype(int)),
-                         cv.FONT_HERSHEY_SIMPLEX,0.5,(255,255,255),2,cv.LINE_AA)
+                         cv.FONT_HERSHEY_SIMPLEX,0.6,(255,255,255),2,cv.LINE_AA)
         
         #etiquetas
-        cv.rectangle(image,(0,0),(180,50),(219,191,255),-1)
-        cv.rectangle(image,(430,0),(800,50),(219,191,255),-1)
+        cv.rectangle(image,(0,0),(210,50),(219,191,255),-1)
+        cv.rectangle(image,(410,0),(800,50),(219,191,255),-1)
         
-        cv.putText(image,"V. Angular = ",
+        cv.putText(image,"V. Angular = {:.2f}".format(v),
                    (10,30),cv.FONT_HERSHEY_SIMPLEX,0.6,(0,0,0),2,cv.LINE_AA)
-        cv.putText(image,"A. Angular = ",
-                   (450,30),cv.FONT_HERSHEY_SIMPLEX,0.6,(0,0,0),2,cv.LINE_AA)
+        cv.putText(image,"A. Angular = {:.2f}".format(w),
+                   (430,30),cv.FONT_HERSHEY_SIMPLEX,0.6,(0,0,0),2,cv.LINE_AA)
         
         game_controller(angle)
-        
-        ai,ti,vi=va_angular(angle,ai,ti,vi)
-        
+          
     except:
         pass
      #dibujar las articulaciones del cuerpo en la imagen
@@ -63,7 +76,7 @@ def image_process (frame,mp_drawing,mp_holistic,holistic,ai,ti,vi):
                               mp_drawing.DrawingSpec(color = (102,31,208),thickness = 2,circle_radius = 3),
                               mp_drawing.DrawingSpec(color = (103,249,237),thickness = 2,circle_radius = 2))
     
-    return image
+    return image,first,vi,ti
 
 def game_controller(angle):
     global stage, rep
@@ -78,32 +91,13 @@ def game_controller(angle):
         rep +=1
         print(rep)
         keyboard.write("w")
-        
-def va_angular(angle,ai=None,ti=None,vi=None):
-    global v,w
-    tf=1
-    if ai==None:
-        ai= angle
-        ti=tf
-        vi=(angle-angle)/(tf-tf)
-        
-    else:
-        v=(angle-ai)/(tf-ti)
-        w=(v-vi)/tf
-        ai=angle
-        ti=tf
-        vi=v
-        print(w)
-        print(v)
-        
-    return ai,ti,vi
+
              
 def main():
-    
     #Definicion de variables
-    ai=None
-    ti=None
-    vi=None
+    first = None
+    ti = None
+    vi = None
     
     #setup mediapie
     mp_drawing = mp.solutions.drawing_utils
@@ -117,9 +111,7 @@ def main():
             #Lerr datos de camara web
             data,frame = capture.read()
             frame = cv.flip(frame,1)
-            image= image_process(frame,mp_drawing,mp_holistic,holistic,ai,ti,vi)
-            t=time.clock()
-            print(t)
+            image,first,vi,ti= image_process(frame,mp_drawing,mp_holistic,holistic,first,ti,vi)
             cv.imshow('camera',image)
             
             if cv.waitKey(1) == ord('q'):
