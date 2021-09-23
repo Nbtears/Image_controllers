@@ -6,39 +6,40 @@ import time
 
 rep = 0
 def angle_calculate(a,b,c,first = None,vi = None,ti = None,):
-    a=np.array(a)
-    b=np.array(b)
-    c=np.array(c)
+    a = np.array(a)
+    b = np.array(b)
+    c = np.array(c)
     
-    radians=np.arctan2(c[1]-b[1],c[0]-b[0]) - np.arctan2(a[1]-b[1],a[0]-b[0])
-    angle=np.abs(radians*180.0/np.pi)
+    radians = np.arctan2(c[1]-b[1],c[0]-b[0]) - np.arctan2(a[1]-b[1],a[0]-b[0])
+    angle = np.abs(radians*180.0/np.pi)
     
     if angle > 180.0:
-        angle=360-angle
+        angle = 360-angle
 
-    tf=time.perf_counter()
+    tf = time.perf_counter()
 
-    if first==None:
+    if first == None:
         first = float(angle)
-        ti=tf
+        ti = tf
         vi=0
         v=0
         w=0
 
     else:
-        v= (angle-first)/(tf-ti)
-        w=(v-vi)/tf
-        first=angle
-        ti=tf
-        vi=v
+        v = (angle-first)/(tf-ti)
+        w = (v-vi)/tf
+        first = angle
+        ti = tf
+        vi = v
     return angle,first,vi,ti,v,w
 
-def image_process (frame,mp_drawing,mp_holistic,holistic, first = None,vi = None,ti = None):  
+def image_process (frame,mp_drawing,mp_holistic,holistic,control, first = None,vi = None,ti = None):  
     global angle
+    
     #cambios de color y aplicar módulo holistic
-    image= cv.cvtColor(frame,cv.COLOR_RGB2BGR)
-    result=holistic.process(image)
-    image= cv.cvtColor(image,cv.COLOR_BGR2RGB)
+    image = cv.cvtColor(frame,cv.COLOR_RGB2BGR)
+    result = holistic.process(image)
+    image = cv.cvtColor(image,cv.COLOR_BGR2RGB)
         #Landmarks
     try: 
         landmarks = result.pose_landmarks.landmark
@@ -67,7 +68,7 @@ def image_process (frame,mp_drawing,mp_holistic,holistic, first = None,vi = None
         cv.putText(image,"A. Angular = {:.2f}".format(w),
                    (430,30),cv.FONT_HERSHEY_SIMPLEX,0.6,(0,0,0),2,cv.LINE_AA)
         
-        game_controller(angle)
+        control = game_controller(angle,control)
           
     except:
         pass
@@ -76,42 +77,49 @@ def image_process (frame,mp_drawing,mp_holistic,holistic, first = None,vi = None
                               mp_drawing.DrawingSpec(color = (102,31,208),thickness = 2,circle_radius = 3),
                               mp_drawing.DrawingSpec(color = (103,249,237),thickness = 2,circle_radius = 2))
     
-    return image,first,vi,ti
+    return image,first,vi,ti,control
 
-def game_controller(angle):
+def game_controller(angle,control):
     global stage, rep
     
-    if angle > 110:
+    if angle > 110 and control != 0:
         stage = 0
+        control = 0
+        keyboard.write("s")
         
-    #if angle > 60 and angle < 100:
         
-    if angle < 60 and stage==0:
-        stage = 1
-        rep +=1
-        print(rep)
+    if angle > 60 and angle < 100 and control != 1:
+        control = 1
+        keyboard.write(" ")  
+        
+    if angle < 60 and control != 2:
+        control = 2
         keyboard.write("w")
-
+        if stage == 0:
+            stage = 1
+            rep += 1
+            print(rep)
+    return control
              
 def main():
     #Definicion de variables
     first = None
     ti = None
     vi = None
-    
+    control = None
+
     #setup mediapie
     mp_drawing = mp.solutions.drawing_utils
     mp_holistic = mp.solutions.holistic 
               
     #Abrir cámara web 
     capture = cv.VideoCapture(0) 
-    
     with mp_holistic.Holistic(min_detection_confidence=0.8,min_tracking_confidence=0.8)as holistic:
         while True:
             #Lerr datos de camara web
             data,frame = capture.read()
             frame = cv.flip(frame,1)
-            image,first,vi,ti= image_process(frame,mp_drawing,mp_holistic,holistic,first,ti,vi)
+            image,first,vi,ti,control = image_process(frame,mp_drawing,mp_holistic,holistic,control,first,ti,vi)
             cv.imshow('camera',image)
             
             if cv.waitKey(1) == ord('q'):
