@@ -1,10 +1,17 @@
 import cv2 as cv
 import mediapipe as mp
 import numpy as np
-import keyboard
+import pyautogui
 import time
+import random
+from itertools import count
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+import threading
 
 rep = 0
+x_vals = []
+y_vals = []
 def angle_calculate(a,b,c,first = None,vi = None,ti = None,):
     a = np.array(a)
     b = np.array(b)
@@ -26,13 +33,13 @@ def angle_calculate(a,b,c,first = None,vi = None,ti = None,):
         w=0
 
     else:
-        v = (angle-first)/(tf-ti)
-        w = (v-vi)/tf
+        v = -(angle-first)/(tf-ti)
+        w = -(v-vi)/tf
         first = angle
         ti = tf
         vi = v
-        if v >= 1.5:
-            keyboard.write("p")
+        if v >= 1:
+            pyautogui.press("P")
     return angle,first,vi,ti,v,w
 
 def image_process (frame,mp_drawing,mp_holistic,holistic,control, first = None,vi = None,ti = None):  
@@ -70,7 +77,7 @@ def image_process (frame,mp_drawing,mp_holistic,holistic,control, first = None,v
         cv.putText(image,"A. Angular = {:.2f}".format(w),
                    (430,30),cv.FONT_HERSHEY_SIMPLEX,0.6,(0,0,0),2,cv.LINE_AA)
         
-        control = game_controller(angle,control)
+        control = game_controller(control)
           
     except:
         pass
@@ -81,36 +88,42 @@ def image_process (frame,mp_drawing,mp_holistic,holistic,control, first = None,v
     
     return image,first,vi,ti,control
 
-def game_controller(angle,control):
+def game_controller(control):
     global stage, rep
     
     if angle > 100 and control != 0:
         stage = 0
         control = 0
-        keyboard.write("s")
+        pyautogui.press("S")
         
         
     if angle > 70 and angle < 100 and control != 1:
         control = 1
-        keyboard.write(" ")  
+        pyautogui.press(" ")  
         
     if angle < 70 and control != 2:
         control = 2
-        keyboard.write("w")
+        pyautogui.press("W")
         if stage == 0:
             stage = 1
             rep += 1
-            keyboard.write("r")  
+            pyautogui.press("R")  
             print(rep)
     return control
+
+def animate(i,index):
+    x_vals.append(next(index))
+    y_vals.append(random.randint(0,5))
+
+    plt.cla()
+    plt.plot(x_vals,y_vals)
              
-def main():
+def Imagen():
     #Definicion de variables
     first = None
     ti = None
     vi = None
     control = None
-
     #setup mediapie
     mp_drawing = mp.solutions.drawing_utils
     mp_holistic = mp.solutions.holistic 
@@ -129,6 +142,18 @@ def main():
                 cv.destroyAllWindows()
                 capture.release() 
                 break 
+
+def main():
+    plt.style.use('fivethirtyeight')
+    index = count()
+    t1 = threading.Thread(target=Imagen, name="t1")
+    t1.start()
+    ani = FuncAnimation(plt.gcf(),animate,fargs=(index,),interval=1000)
+
+    plt.tight_layout()
+    plt.show()
+
+    t1.join()
       
 if __name__=="__main__":
     main()          
