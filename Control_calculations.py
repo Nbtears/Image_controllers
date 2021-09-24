@@ -31,6 +31,8 @@ def angle_calculate(a,b,c,first = None,vi = None,ti = None,):
         first = angle
         ti = tf
         vi = v
+        if v >= 1.5:
+            keyboard.write("p")
     return angle,first,vi,ti,v,w
 
 def image_process (frame,mp_drawing,mp_holistic,holistic,control, first = None,vi = None,ti = None):  
@@ -82,22 +84,23 @@ def image_process (frame,mp_drawing,mp_holistic,holistic,control, first = None,v
 def game_controller(angle,control):
     global stage, rep
     
-    if angle > 110 and control != 0:
+    if angle > 100 and control != 0:
         stage = 0
         control = 0
         keyboard.write("s")
         
         
-    if angle > 60 and angle < 100 and control != 1:
+    if angle > 70 and angle < 100 and control != 1:
         control = 1
         keyboard.write(" ")  
         
-    if angle < 60 and control != 2:
+    if angle < 70 and control != 2:
         control = 2
         keyboard.write("w")
         if stage == 0:
             stage = 1
             rep += 1
+            keyboard.write("r")  
             print(rep)
     return control
              
