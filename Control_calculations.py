@@ -111,12 +111,14 @@ def game_controller(control):
             print(rep)
     return control
 
-def animate(i,index):
-    x_vals.append(next(index))
-    y_vals.append(random.randint(0,5))
+def animate(i):
+    try:
+        x_vals.append(angle)
+        y_vals.append(len(x_vals))
 
-    plt.cla()
-    plt.plot(x_vals,y_vals)
+        plt.cla()
+        plt.plot(y_vals,x_vals)
+    except: pass
              
 def Imagen():
     #Definicion de variables
@@ -148,7 +150,7 @@ def main():
     index = count()
     t1 = threading.Thread(target=Imagen, name="t1")
     t1.start()
-    ani = FuncAnimation(plt.gcf(),animate,fargs=(index,),interval=1000)
+    ani = FuncAnimation(plt.gcf(),animate,interval=1000)
 
     plt.tight_layout()
     plt.show()
