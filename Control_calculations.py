@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import threading
 
+r = 0
 rep = 0
 x_vals = []
 y_vals = []
@@ -114,10 +115,15 @@ def game_controller(control):
 def animate(i):
     try:
         x_vals.append(angle)
-        y_vals.append(len(x_vals))
-
+        if len(x_vals) > 10:
+            x_vals.pop(0)
+        
         plt.cla()
-        plt.plot(y_vals,x_vals)
+        plt.ylim(0,180)
+        #plt.xlim(i,i+9)
+        plt.ylabel("angle (°)")
+        plt.xlabel("time (s)")
+        plt.plot(x_vals,"g")
     except: pass
              
 def Imagen():
@@ -146,15 +152,14 @@ def Imagen():
                 break 
 
 def main():
-    plt.style.use('fivethirtyeight')
-    index = count()
+    fig = plt.figure()
+    plt.title("Angle transition")
     t1 = threading.Thread(target=Imagen, name="t1")
     t1.start()
-    ani = FuncAnimation(plt.gcf(),animate,interval=1000)
+    ani = FuncAnimation(plt.gcf(),animate,interval=500)
 
     plt.tight_layout()
     plt.show()
-
     t1.join()
       
 if __name__=="__main__":
