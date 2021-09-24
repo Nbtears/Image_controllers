@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import threading
 
-r = 0
 rep = 0
 x_vals = []
 y_vals = []
@@ -97,7 +96,6 @@ def game_controller(control):
         control = 0
         pyautogui.press("S")
         
-        
     if angle > 70 and angle < 100 and control != 1:
         control = 1
         pyautogui.press(" ")  
@@ -115,15 +113,14 @@ def game_controller(control):
 def animate(i):
     try:
         x_vals.append(angle)
-        if len(x_vals) > 10:
+        if len(x_vals) > 20:
             x_vals.pop(0)
         
         plt.cla()
         plt.ylim(0,180)
-        #plt.xlim(i,i+9)
         plt.ylabel("angle (°)")
         plt.xlabel("time (s)")
-        plt.plot(x_vals,"g")
+        plt.plot(x_vals,"palevioletred",linewidth=3.0)
     except: pass
              
 def Imagen():
@@ -152,8 +149,7 @@ def Imagen():
                 break 
 
 def main():
-    fig = plt.figure()
-    plt.title("Angle transition")
+    plt.figure("Angles transition")
     t1 = threading.Thread(target=Imagen, name="t1")
     t1.start()
     ani = FuncAnimation(plt.gcf(),animate,interval=500)
