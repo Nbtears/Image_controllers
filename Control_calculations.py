@@ -1,3 +1,4 @@
+from logging import currentframe
 import cv2 as cv
 import mediapipe as mp
 import numpy as np
@@ -12,6 +13,7 @@ import threading
 rep = 0
 x_vals = []
 y_vals = []
+cuenta = 0
 def angle_calculate(a,b,c,first = None,vi = None,ti = None,):
     a = np.array(a)
     b = np.array(b)
@@ -26,16 +28,16 @@ def angle_calculate(a,b,c,first = None,vi = None,ti = None,):
     tf = time.perf_counter()
 
     if first == None:
-        first = float(angle)
+        first = float(radians)
         ti = tf
         vi=0
         v=0
         w=0
 
     else:
-        v = -(angle-first)/(tf-ti)
-        w = -(v-vi)/tf
-        first = angle
+        v = (radians-first)/(tf-ti)
+        w = (v-vi)/(tf-ti)
+        first = radians
         ti = tf
         vi = v
         if v >= 1:
@@ -110,17 +112,27 @@ def game_controller(control):
             print(rep)
     return control
 
+def contador():
+    global cuenta
+    cuenta+=0.5
+
 def animate(i):
+    
     try:
+        contador()
         x_vals.append(angle)
+        y_vals.append(cuenta)
+
         if len(x_vals) > 20:
             x_vals.pop(0)
+            y_vals.pop(0)
         
         plt.cla()
         plt.ylim(0,180)
         plt.ylabel("angle (°)")
         plt.xlabel("time (s)")
-        plt.plot(x_vals,"palevioletred",linewidth=3.0)
+        plt.autoscale(enable=True,axis='x')
+        plt.plot(y_vals,x_vals,"palevioletred",linewidth=3.0)
     except: pass
              
 def Imagen():
@@ -149,7 +161,7 @@ def Imagen():
                 break 
 
 def main():
-    plt.figure("Angles transition")
+    plt.figure("Angle transition")
     t1 = threading.Thread(target=Imagen, name="t1")
     t1.start()
     ani = FuncAnimation(plt.gcf(),animate,interval=500)
