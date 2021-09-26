@@ -26,11 +26,13 @@ class DataBase():
         
         try:
             self.cursor.execute(sql,(aa,ai,vm,cm,va,ca,rep,id))
+            self.connection.commit()
         except: 
             pass
 
     def print_data(self,name,id):
-        sql= "SELECT * FROM {} WHERE sesion = {}". format(name,id)
+        # name tabla que queremos revisar
+        sql = "SELECT * FROM {} WHERE sesion = {}". format(name,id)
         try:
             self.cursor.execute(sql)
             info = self.cursor.fetchone()
@@ -38,15 +40,16 @@ class DataBase():
         except:
             pass
 
+    def calibration(self,a,b,name1,name2,id):
+        # name1 y name2 datos regresion(m y b) 
+        # o datos de umbrlaes del paciente(umax y umin)
+        # a y b son esos datos
+        sql = "INSERT INTO sesion ({},{}) VALUES (%s,%s) WHERE id = {}".format(name1,name2,id)
+        try:
+            self.cursor.execute(sql,(a,b))
+            self.connection.commit()
+        except:
+            pass
+
     def close(self):
         self.connection.close()
-
-data = DataBase()
-user = data.get_user()
-data.insert_data(user[0],10)
-name = 'game'
-data.print_data(name,user[0])
-data.close()
-
-
-
