@@ -1,11 +1,8 @@
-from logging import currentframe
 import cv2 as cv
 import mediapipe as mp
 import numpy as np
 import pyautogui
 import time
-import random
-from itertools import count
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import threading
@@ -14,7 +11,13 @@ rep = 0
 x_vals = []
 y_vals = []
 cuenta = 0
+maxang = 0
+minang = 0
+maxv = -1000
+maxw = -1000
+
 def angle_calculate(a,b,c,first = None,vi = None,ti = None,):
+    global maxv, maxw
     a = np.array(a)
     b = np.array(b)
     c = np.array(c)
@@ -28,24 +31,32 @@ def angle_calculate(a,b,c,first = None,vi = None,ti = None,):
     tf = time.perf_counter()
 
     if first == None:
-        first = float(radians)
+        first = float(angle)
         ti = tf
         vi=0
         v=0
         w=0
 
     else:
-        v = (radians-first)/(tf-ti)
+        v = (angle-first)/(tf-ti)
         w = (v-vi)/(tf-ti)
-        first = radians
+        first = angle
         ti = tf
         vi = v
+
+        if v > maxv:
+                maxv = v    
+        if w > maxw:
+                maxw = w 
+
         if v >= 1:
             pyautogui.press("P")
+
+
     return angle,first,vi,ti,v,w
 
 def image_process (frame,mp_drawing,mp_holistic,holistic,control, first = None,vi = None,ti = None):  
-    global angle
+    global angle,maxang, minang, maxangimage, minangimage
     
     #cambios de color y aplicar módulo holistic
     image = cv.cvtColor(frame,cv.COLOR_RGB2BGR)
@@ -80,6 +91,13 @@ def image_process (frame,mp_drawing,mp_holistic,holistic,control, first = None,v
                    (430,30),cv.FONT_HERSHEY_SIMPLEX,0.6,(0,0,0),2,cv.LINE_AA)
         
         control = game_controller(control)
+
+        if angle > maxang:
+                maxang = angle
+                maxangimage = image
+        elif angle < minang:
+            minang = angle
+            minangimage = image
           
     except:
         pass
@@ -114,10 +132,9 @@ def game_controller(control):
 
 def contador():
     global cuenta
-    cuenta+=0.5
+    cuenta += 0.8
 
-def animate(i):
-    
+def animate(i): 
     try:
         contador()
         x_vals.append(angle)
@@ -164,7 +181,7 @@ def main():
     plt.figure("Angle transition")
     t1 = threading.Thread(target=Imagen, name="t1")
     t1.start()
-    ani = FuncAnimation(plt.gcf(),animate,interval=500)
+    ani = FuncAnimation(plt.gcf(),animate,interval=800)
 
     plt.tight_layout()
     plt.show()
