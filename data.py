@@ -30,9 +30,10 @@ class DataBase():
         except: 
             pass
 
-    def print_data(self,name,id):
+    def print_data(self,name,key,id):
         # name tabla que queremos revisar
-        sql = "SELECT * FROM {} WHERE sesion = {}". format(name,id)
+        # key identificador
+        sql = "SELECT * FROM {} WHERE {} = {}".format(name,key,id)
         try:
             self.cursor.execute(sql)
             info = self.cursor.fetchone()
@@ -40,7 +41,7 @@ class DataBase():
         except:
             pass
 
-    def calibration(self,a,b,name1,name2,id):
+    def add_calibration(self,a,b,name1,name2,id):
         # name1 y name2 datos regresion(m y b) 
         # o datos de umbrlaes del paciente(umax y umin)
         # a y b son esos datos
@@ -50,6 +51,15 @@ class DataBase():
             self.connection.commit()
         except:
             pass
+    
+    def show_calibration (self,name1,name2,id):
+        sql = "SELECT {},{} FROM sesion WHERE id = {}".format(name1,name2,id)
+        try:
+            self.cursor.execute(sql)
+            data = self.cursor.fetchone()
+        except:
+            pass
+        return data
 
     def close(self):
         self.connection.close()
