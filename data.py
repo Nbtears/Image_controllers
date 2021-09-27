@@ -61,5 +61,14 @@ class DataBase():
             pass
         return data
 
+    def show_arm(self,user):
+        sql = "SELECT arm FROM user WHERE username = {}".format(user)
+        try:
+            self.cursor.execute(sql)
+            arm = self.cursor.fetchone()
+        except:
+            pass
+        return arm
+
     def close(self):
         self.connection.close()
