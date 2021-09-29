@@ -15,9 +15,18 @@ class DataBase():
         try :
             self.cursor.execute(sql)
             user = self.cursor.fetchone()
-            print(user)
             return user
 
+        except:
+            pass
+
+    def show_arm(self,user):
+        sql = "SELECT arm FROM user WHERE username = '{}'".format(user)
+        try:
+            self.cursor.execute(sql)
+            arm = self.cursor.fetchone()
+            print(arm)
+            return arm
         except:
             pass
 
@@ -35,7 +44,7 @@ class DataBase():
         # key identificador
         sql = "SELECT * FROM {} WHERE {} = {}".format(name,key,id)
         try:
-            self.cursor.execute(sql)
+            self.cursor.execute(sql,())
             info = self.cursor.fetchone()
             print(info)
         except:
@@ -57,18 +66,14 @@ class DataBase():
         try:
             self.cursor.execute(sql)
             data = self.cursor.fetchone()
+            return data
         except:
             pass
-        return data
-
-    def show_arm(self,user):
-        sql = "SELECT arm FROM user WHERE username = {}".format(user)
-        try:
-            self.cursor.execute(sql)
-            arm = self.cursor.fetchone()
-        except:
-            pass
-        return arm
-
+       
     def close(self):
         self.connection.close()
+
+
+data = DataBase()
+x = data.get_user()
+data.show_arm(x[1])
