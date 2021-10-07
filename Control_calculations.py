@@ -6,6 +6,7 @@ import time
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import threading
+import data
 
 rep = 0
 x_vals = []
@@ -15,6 +16,8 @@ maxang = 0
 minang = 0
 maxv = -1000
 maxw = -1000
+#Base = data.DataBase()
+arm = 0
 
 def angle_calculate(a,b,c,first = None,vi = None,ti = None,):
     global maxv, maxw
@@ -66,15 +69,27 @@ def image_process (frame,mp_drawing,mp_holistic,holistic,control, first = None,v
     try: 
         landmarks = result.pose_landmarks.landmark
         
-        #coordenadas de brazo izq
-        shoulder_L = [landmarks[mp_holistic.PoseLandmark.LEFT_SHOULDER.value].x,
-                  landmarks[mp_holistic.PoseLandmark.LEFT_SHOULDER.value].y]
-        elbow_L = [landmarks[mp_holistic.PoseLandmark.LEFT_ELBOW.value].x,
-                  landmarks[mp_holistic.PoseLandmark.LEFT_ELBOW.value].y]
-        wrist_L = [landmarks[mp_holistic.PoseLandmark.LEFT_WRIST.value].x,
-                  landmarks[mp_holistic.PoseLandmark.LEFT_WRIST.value].y]
-        
-        angle,first,vi,ti,v,w = angle_calculate(shoulder_L,elbow_L,wrist_L,first,vi,ti)
+        if arm == 0:
+            #coordenadas de brazo izq
+            shoulder_L = [landmarks[mp_holistic.PoseLandmark.LEFT_SHOULDER.value].x,
+                    landmarks[mp_holistic.PoseLandmark.LEFT_SHOULDER.value].y]
+            elbow_L = [landmarks[mp_holistic.PoseLandmark.LEFT_ELBOW.value].x,
+                    landmarks[mp_holistic.PoseLandmark.LEFT_ELBOW.value].y]
+            wrist_L = [landmarks[mp_holistic.PoseLandmark.LEFT_WRIST.value].x,
+                    landmarks[mp_holistic.PoseLandmark.LEFT_WRIST.value].y]
+            
+            angle,first,vi,ti,v,w = angle_calculate(shoulder_L,elbow_L,wrist_L,first,vi,ti)
+
+        else: 
+            #coordenadas de brazo der
+            shoulder_R = [landmarks[mp_holistic.PoseLandmark.LEFT_SHOULDER.value].x,
+                    landmarks[mp_holistic.PoseLandmark.LEFT_SHOULDER.value].y]
+            elbow_R = [landmarks[mp_holistic.PoseLandmark.LEFT_ELBOW.value].x,
+                    landmarks[mp_holistic.PoseLandmark.LEFT_ELBOW.value].y]
+            wrist_R = [landmarks[mp_holistic.PoseLandmark.LEFT_WRIST.value].x,
+                    landmarks[mp_holistic.PoseLandmark.LEFT_WRIST.value].y]
+            
+            angle,first,vi,ti,v,w = angle_calculate(shoulder_R,elbow_R,wrist_R,first,vi,ti)
         
         #look angle
         cv.putText(image,str(int(angle)),
@@ -132,7 +147,7 @@ def game_controller(control):
 
 def contador():
     global cuenta
-    cuenta += 0.8
+    cuenta += 0.7
 
 def animate(i): 
     try:
@@ -158,6 +173,10 @@ def Imagen():
     ti = None
     vi = None
     control = None
+    
+    #data base
+    #user = Base.get_user()
+    
     #setup mediapie
     mp_drawing = mp.solutions.drawing_utils
     mp_holistic = mp.solutions.holistic 
@@ -181,7 +200,7 @@ def main():
     plt.figure("Angle transition")
     t1 = threading.Thread(target=Imagen, name="t1")
     t1.start()
-    ani = FuncAnimation(plt.gcf(),animate,interval=800)
+    ani = FuncAnimation(plt.gcf(),animate,interval=700)
 
     plt.tight_layout()
     plt.show()

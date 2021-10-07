@@ -42,7 +42,7 @@ class DataBase():
     def print_data(self,name,key,id):
         # name tabla que queremos revisar
         # key identificador
-        sql = "SELECT * FROM {} WHERE {} = {}".format(name,key,id)
+        sql = "SELECT * FROM {} WHERE {} = '{}'".format(name,key,id)
         try:
             self.cursor.execute(sql,())
             info = self.cursor.fetchone()
@@ -72,8 +72,3 @@ class DataBase():
        
     def close(self):
         self.connection.close()
-
-
-data = DataBase()
-x = data.get_user()
-data.show_arm(x[1])
