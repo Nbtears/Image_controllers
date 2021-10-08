@@ -6,6 +6,7 @@ import time
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import threading
+import Base
 
 
 rep = 0
@@ -16,7 +17,7 @@ maxang = 0
 minang = 0
 maxv = -1000
 maxw = -1000
-#Base = data.DataBase()
+Base = Base.DataBase()
 x=0
 stage=0
 puntos=[16,14,12,11,13,15]
@@ -105,6 +106,15 @@ def image_process (frame,mp_drawing,mp_holistic,holistic,control):
                 lm_p[mp_holistic.PoseLandmark.LEFT_ELBOW.value].y]
         W = [lm_p[mp_holistic.PoseLandmark.LEFT_WRIST.value].x,
                 lm_p[mp_holistic.PoseLandmark.LEFT_WRIST.value].y]
+
+        #coordenadas brazo izq
+        H= [lm_p[mp_holistic.PoseLandmark.LEFT_SHOULDER.value].x,
+                lm_p[mp_holistic.PoseLandmark.LEFT_SHOULDER.value].y]
+        C= [lm_p[mp_holistic.PoseLandmark.LEFT_ELBOW.value].x,
+                lm_p[mp_holistic.PoseLandmark.LEFT_ELBOW.value].y]
+        M = [lm_p[mp_holistic.PoseLandmark.LEFT_WRIST.value].x,
+                lm_p[mp_holistic.PoseLandmark.LEFT_WRIST.value].y]
+
         angle,v,w = angle_calculate(S,E,W)
         
         if lm_p is not None:
@@ -152,6 +162,7 @@ def image_process (frame,mp_drawing,mp_holistic,holistic,control):
         
         cv.putText(image,"V. Angular = {:.2f}".format(v), (10,30),cv.FONT_HERSHEY_SIMPLEX,0.6,(0,0,0),2,cv.LINE_AA)
         cv.putText(image,"A. Angular = {:.2f}".format(w), (410,30),cv.FONT_HERSHEY_SIMPLEX,0.6,(0,0,0),2,cv.LINE_AA)
+
         control = game_controller(control)
         if angle > maxang:
                 maxang = angle
@@ -186,9 +197,9 @@ def animate(i):
 
 def Imagen():
     control = 0
-    global width, height
+    global width, height, user
     #data base
-    #user = Base.get_user()
+    user = Base.get_user()
     
     #setup mediapipe
     mp_drawing = mp.solutions.drawing_utils

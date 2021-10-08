@@ -25,7 +25,6 @@ class DataBase():
         try:
             self.cursor.execute(sql)
             arm = self.cursor.fetchone()
-            print(arm)
             return arm
         except:
             pass
@@ -72,3 +71,8 @@ class DataBase():
        
     def close(self):
         self.connection.close()
+
+d = DataBase()
+u = d.get_user()
+a = d.show_arm(u[1])
+print (a)
