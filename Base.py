@@ -1,3 +1,4 @@
+import abc
 import pymysql
 
 class DataBase():
@@ -75,4 +76,15 @@ class DataBase():
 d = DataBase()
 u = d.get_user()
 a = d.show_arm(u[1])
-print (a)
+print(u)
+print(a)
+if u[1] == 'Dozen':
+    print("hi")
+else:
+    print ("dont")
+
+if a[0] == 'R':
+    print("weño")
+else:
+    print ("no")
+

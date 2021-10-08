@@ -17,7 +17,6 @@ maxang = 0
 minang = 0
 maxv = -1000
 maxw = -1000
-Base = Base.DataBase()
 x=0
 stage=0
 puntos=[16,14,12,11,13,15]
@@ -115,7 +114,14 @@ def image_process (frame,mp_drawing,mp_holistic,holistic,control):
         M = [lm_p[mp_holistic.PoseLandmark.LEFT_WRIST.value].x,
                 lm_p[mp_holistic.PoseLandmark.LEFT_WRIST.value].y]
 
-        angle,v,w = angle_calculate(S,E,W)
+        if arm[0]== 'R':
+            angle,v,w = angle_calculate(S,E,W)
+             #look angle
+            cv.putText(image,str(int(angle)),tuple(np.multiply(E,[647,510]).astype(int)),cv.FONT_HERSHEY_SIMPLEX,0.6,(255,255,255),2,cv.LINE_AA)
+        else:
+            angle,v,w = angle_calculate(H,C,M)
+             #look angle
+            cv.putText(image,str(int(angle)),tuple(np.multiply(C,[647,510]).astype(int)),cv.FONT_HERSHEY_SIMPLEX,0.6,(255,255,255),2,cv.LINE_AA)
         
         if lm_p is not None:
             c=True
@@ -153,9 +159,6 @@ def image_process (frame,mp_drawing,mp_holistic,holistic,control):
         for i in range(len(coor)):
             cv.circle(image,(int(coor[i,0]),int(coor[i,1])),3,(102,31,208),2)  
         
-        #look angle
-        cv.putText(image,str(int(angle)),tuple(np.multiply(E,[647,510]).astype(int)),cv.FONT_HERSHEY_SIMPLEX,0.6,(255,255,255),2,cv.LINE_AA)
-        
         #etiquetas
         cv.rectangle(image,(0,0),(230,50),(219,191,255),-1)
         cv.rectangle(image,(400,0),(800,50),(219,191,255),-1)
@@ -175,7 +178,6 @@ def image_process (frame,mp_drawing,mp_holistic,holistic,control):
 def contador():
     global cuenta
     cuenta += 0.7
-
 
 def animate(i): 
     try:
@@ -197,10 +199,7 @@ def animate(i):
 
 def Imagen():
     control = 0
-    global width, height, user
-    #data base
-    user = Base.get_user()
-    
+    global width, height, user    
     #setup mediapipe
     mp_drawing = mp.solutions.drawing_utils
     mp_holistic = mp.solutions.holistic 
@@ -221,7 +220,17 @@ def Imagen():
                 cv.destroyAllWindows()  
                 break 
 
+def base_control():
+    global Db,arm,user
+    Db = Base.DataBase()
+    user = Db.get_user()
+    arm = Db.show_arm(user[1])
+
+def write_base():
+    Db.insert_data(maxang,minang)
+
 def main():
+    base_control()
     plt.figure("Angle transition")
     t1 = threading.Thread(target=Imagen, name="t1")
     t1.start()
