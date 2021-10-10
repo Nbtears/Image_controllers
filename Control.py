@@ -55,6 +55,11 @@ def angle_calculate(a,b,c):
         ace[1]=(vel[1]-vel[0])/(t[1]-t[0])
         v=vel[1]
         w=ace[1]
+
+        if v > maxv:
+                maxv = v    
+        if w > maxw:
+                maxw = w 
         
         if v >= 100:
             pyautogui.press("P")
@@ -107,18 +112,19 @@ def image_process (frame,mp_drawing,mp_holistic,holistic,control):
                 lm_p[mp_holistic.PoseLandmark.LEFT_WRIST.value].y]
 
         #coordenadas brazo izq
-        H= [lm_p[mp_holistic.PoseLandmark.LEFT_SHOULDER.value].x,
-                lm_p[mp_holistic.PoseLandmark.LEFT_SHOULDER.value].y]
-        C= [lm_p[mp_holistic.PoseLandmark.LEFT_ELBOW.value].x,
-                lm_p[mp_holistic.PoseLandmark.LEFT_ELBOW.value].y]
-        M = [lm_p[mp_holistic.PoseLandmark.LEFT_WRIST.value].x,
-                lm_p[mp_holistic.PoseLandmark.LEFT_WRIST.value].y]
+        H= [lm_p[mp_holistic.PoseLandmark.RIGHT_SHOULDER.value].x,
+                lm_p[mp_holistic.PoseLandmark.RIGHT_SHOULDER.value].y]
+        C= [lm_p[mp_holistic.PoseLandmark.RIGHT_ELBOW.value].x,
+                lm_p[mp_holistic.PoseLandmark.RIGHT_ELBOW.value].y]
+        M = [lm_p[mp_holistic.PoseLandmark.RIGHT_WRIST.value].x,
+                lm_p[mp_holistic.PoseLandmark.RIGHT_WRIST.value].y]
 
-        if arm[0]== 'R':
+        if arm[0] == 'R':
             angle,v,w = angle_calculate(S,E,W)
              #look angle
             cv.putText(image,str(int(angle)),tuple(np.multiply(E,[647,510]).astype(int)),cv.FONT_HERSHEY_SIMPLEX,0.6,(255,255,255),2,cv.LINE_AA)
         else:
+            print('l')
             angle,v,w = angle_calculate(H,C,M)
              #look angle
             cv.putText(image,str(int(angle)),tuple(np.multiply(C,[647,510]).astype(int)),cv.FONT_HERSHEY_SIMPLEX,0.6,(255,255,255),2,cv.LINE_AA)
@@ -173,6 +179,7 @@ def image_process (frame,mp_drawing,mp_holistic,holistic,control):
         elif angle < minang:
             minang = angle
             minangimage = image
+        
     return image,control
 
 def contador():
@@ -214,10 +221,17 @@ def Imagen():
             frame = cv.flip(frame,1)
             image,control = image_process(frame,mp_drawing,mp_holistic,holistic,control)
             cv.imshow('camera',image)
+
+            if rep >= 8 :
+                capture.release() 
+                cv.destroyAllWindows()  
+                write_base()
+                break 
             
             if cv.waitKey(1) == ord('q'):
                 capture.release() 
                 cv.destroyAllWindows()  
+                write_base()
                 break 
 
 def base_control():
@@ -227,7 +241,8 @@ def base_control():
     arm = Db.show_arm(user[1])
 
 def write_base():
-    Db.insert_data(maxang,minang)
+    Db.insert_data(maxang,minang,maxv,maxw,0,0,rep,user[0])
+    Db.close()
 
 def main():
     base_control()

@@ -72,19 +72,12 @@ class DataBase():
        
     def close(self):
         self.connection.close()
+    
+Db = DataBase()
+u = Db.get_user()
+a = Db.show_arm(u[1])
+print (a)
 
-d = DataBase()
-u = d.get_user()
-a = d.show_arm(u[1])
-print(u)
-print(a)
-if u[1] == 'Dozen':
-    print("hi")
-else:
-    print ("dont")
+Db.close()
 
-if a[0] == 'R':
-    print("weño")
-else:
-    print ("no")
 
