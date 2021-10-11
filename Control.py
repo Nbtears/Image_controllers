@@ -124,7 +124,6 @@ def image_process (frame,mp_drawing,mp_holistic,holistic,control):
              #look angle
             cv.putText(image,str(int(angle)),tuple(np.multiply(E,[647,510]).astype(int)),cv.FONT_HERSHEY_SIMPLEX,0.6,(255,255,255),2,cv.LINE_AA)
         else:
-            print('l')
             angle,v,w = angle_calculate(H,C,M)
              #look angle
             cv.putText(image,str(int(angle)),tuple(np.multiply(C,[647,510]).astype(int)),cv.FONT_HERSHEY_SIMPLEX,0.6,(255,255,255),2,cv.LINE_AA)
@@ -202,7 +201,11 @@ def animate(i):
         plt.xlabel("time (s)")
         plt.autoscale(enable=True,axis='x')
         plt.plot(y_vals,x_vals,"palevioletred",linewidth=3.0)
-    except: pass
+
+        if rep >= 5:
+            plt.close()
+    except: 
+        pass
 
 def Imagen():
     control = 0
@@ -222,7 +225,7 @@ def Imagen():
             image,control = image_process(frame,mp_drawing,mp_holistic,holistic,control)
             cv.imshow('camera',image)
 
-            if rep >= 8 :
+            if rep >= 5 :
                 capture.release() 
                 cv.destroyAllWindows()  
                 write_base()
@@ -241,7 +244,7 @@ def base_control():
     arm = Db.show_arm(user[1])
 
 def write_base():
-    Db.insert_data(maxang,minang,maxv,maxw,0,0,rep,user[0])
+    Db.insert_data(maxang,minang,maxv,maxw,0,0,rep,1,user[0])
     Db.close()
 
 def main():

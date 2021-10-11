@@ -30,11 +30,11 @@ class DataBase():
         except:
             pass
 
-    def insert_data(self,aa,ai,vm,cm,va,ca,rep,id):
-        sql = "INSERT INTO game (angle_max,angle_min,vel_max,acc_max,vel_avg,acc_avg,rep,sesion) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)".format()
+    def insert_data(self,aa,ai,vm,cm,va,ca,rep,level,id):
+        sql = "INSERT INTO game (angle_max,angle_min,vel_max,acc_max,vel_avg,acc_avg,rep,level,sesion) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)".format()
         
         try:
-            self.cursor.execute(sql,(aa,ai,vm,cm,va,ca,rep,id))
+            self.cursor.execute(sql,(aa,ai,vm,cm,va,ca,rep,level,id))
             self.connection.commit()
         except: 
             pass
