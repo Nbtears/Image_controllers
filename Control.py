@@ -245,7 +245,6 @@ def base_control():
 
 def write_base():
     Db.insert_data(maxang,minang,maxv,maxw,0,0,rep,1,user[0])
-    Db.close()
 
 def main():
     base_control()

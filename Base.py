@@ -70,14 +70,7 @@ class DataBase():
         except:
             pass
        
-    def close(self):
+    def __del__(self):
         self.connection.close()
-    
-Db = DataBase()
-u = Db.get_user()
-a = Db.show_arm(u[1])
-print (a)
-
-Db.close()
 
 
