@@ -10,6 +10,7 @@ import threading
 from math import dist
 # Gimport Base
 n = 0
+o = 0
 rep = 0
 x_vals = []
 y_vals = []
@@ -311,7 +312,7 @@ def contador():
 
 
 def animate(i):
-    global capture, current_time, tlim, n, j, rep, rep_sp
+    global capture, current_time, tlim, n, j, rep, rep_sp, o
     try:
         contador()
         x_vals.append(angle)
@@ -327,7 +328,8 @@ def animate(i):
         plt.autoscale(enable=True, axis='x')
         plt.plot(y_vals, x_vals, "palevioletred", linewidth=3.0)
 
-        if current_time >= (tlim/2):
+        if current_time >= (tlim/2) and o == 0:
+            o = 1
             pyautogui.press("H")
 
         if current_time >= tlim and n == 0:
