@@ -206,13 +206,13 @@ def image_process(frame, holistic, control, exer):
                 cv.putText(image, str(int(angle)), tuple(np.multiply(E, [647, 510]).astype(
                     int)), cv.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2, cv.LINE_AA)
                 # etiquetas
-                cv.rectangle(image, (0, 0), (230, 50), (219, 191, 255), -1)
-                cv.rectangle(image, (400, 0), (800, 50), (219, 191, 255), -1)
+                cv.rectangle(image, (0, 0), (210, 50), (219, 191, 255), -1)
+                cv.rectangle(image, (420, 0), (820, 50), (219, 191, 255), -1)
 
-                cv.putText(image, "V. Angular = {:.2f}".format(
-                    vel[1]), (10, 30), cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2, cv.LINE_AA)
-                cv.putText(image, "A. Angular = {:.2f}".format(
-                    ace[1]), (410, 30), cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2, cv.LINE_AA)
+                cv.putText(image, "V. angular = {:.2f}".format(
+                    vel[1]), (10, 30), cv.FONT_HERSHEY_SIMPLEX, 0.58, (0, 0, 0), 2, cv.LINE_AA)
+                cv.putText(image, "A. angular = {:.2f}".format(
+                    ace[1]), (428, 30), cv.FONT_HERSHEY_SIMPLEX, 0.58, (0, 0, 0), 2, cv.LINE_AA)
                 cv.putText(image, "Flexion y Extension", (225, 20),
                            cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2, cv.LINE_AA)
                 control = game_controller(control)
@@ -246,7 +246,8 @@ def sup_pro(coor_mano, E, W, image):
                 pyautogui.press("M")
                 print(rep_sp)
         else:
-            image = cv.rectangle(image, (0, 0), (640, 480), (3, 3, 252), 50)
+            image = cv.rectangle(
+                image, (0, 0), (640, 480), (102, 102, 255), 50)
             cv.putText(image, "Posiciona tu antebrazo verticalmente", (135, 470),
                        cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2, cv.LINE_AA)
 
@@ -263,11 +264,11 @@ def pendiente(E, W):
 
 def colormarco(is_all_true, image):
     if is_all_true == True:
-        image = cv.rectangle(image, (0, 0), (640, 480), (0, 255, 0), 50)
+        image = cv.rectangle(image, (0, 0), (640, 480), (170, 224, 130), 50)
     else:
-        image = cv.rectangle(image, (0, 0), (640, 480), (3, 3, 252), 50)
-        cv.putText(image, "Posicionate dentro del recuadro y en medio de la linea vertical",
-                   (10, 470), cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2, cv.LINE_AA)
+        image = cv.rectangle(image, (0, 0), (640, 480), (102, 102, 255), 50)
+        cv.putText(image, "Posicionate dentro del recuadro",
+                   (160, 470), cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2, cv.LINE_AA)
     return image
 
 
@@ -292,16 +293,12 @@ def encuadrar(coor, image):
             pi = True
         else:
             pi = False
-            cv.line(image, (vx, 100), (vx, 400),
-                    (219, 230, 101), 3)  # vertical
     else:
         vx = width-200
         if coor[2, 0] < vx and coor[3, 0] > vx and is_all_true == True:
             pi = True
         else:
             pi = False
-            cv.line(image, (vx, 100), (vx, 400),
-                    (219, 230, 101), 3)  # vertical
 
     image = colormarco(pi, image)
 
@@ -418,7 +415,7 @@ def medir_tiempo(cuadro):
 def avisos(image, t):
     global rt
     if t > 0 and t < rt[0]:
-        cv.putText(image, " Mantente quieto", (235, 470),
+        cv.putText(image, "Mantente quieto", (235, 470),
                    cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2, cv.LINE_AA)
     if t >= rt[0] and t < rt[1]:
         cv.putText(image, "Flexiona el codo", (235, 470),
