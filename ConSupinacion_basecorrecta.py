@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import threading
 from math import dist
-#Gimport Base
-n=0
+# Gimport Base
+n = 0
 rep = 0
 x_vals = []
 y_vals = []
@@ -18,14 +18,14 @@ maxang = -360
 minang = 360
 maxv = -1000
 maxw = -1000
-vtotal=0
-wtotal=0
-angtotal=0
+vtotal = 0
+wtotal = 0
+angtotal = 0
 x = 0
 stage = 0
 angle = 0
-j=0
-s=0
+j = 0
+s = 0
 
 
 def angle_calculate(a, b, c):
@@ -33,14 +33,15 @@ def angle_calculate(a, b, c):
     a = np.array(a)
     b = np.array(b)
     c = np.array(c)
-    radians = np.arctan2(c[1]-b[1], c[0]-b[0]) - np.arctan2(a[1]-b[1], a[0]-b[0])
+    radians = np.arctan2(c[1]-b[1], c[0]-b[0]) - \
+        np.arctan2(a[1]-b[1], a[0]-b[0])
     angle = np.abs(radians*180.0/np.pi)
     if angle > 180.0:
         angle = 360-angle
 
 
 def vw_calculate():
-    global maxv, maxw, t, ang, ace, vel, x, angle,j,vtotal,wtotal,angtotal
+    global maxv, maxw, t, ang, ace, vel, x, angle, j, vtotal, wtotal, angtotal
     if x == 0:
         t = np.array([time.time(), time.time()], dtype=float)
         ang = np.array([0, angle], dtype=float)
@@ -50,7 +51,7 @@ def vw_calculate():
         v = vel[1]
         w = ace[1]
     else:
-        j+=1
+        j += 1
         ang = np.flipud(ang)
         ang[1] = angle
         t = np.flipud(t)
@@ -66,11 +67,11 @@ def vw_calculate():
         if w > maxw:
             maxw = w
 
-        angtotal+=angle
-        vtotal+=v
-        wtotal+=w
+        angtotal += angle
+        vtotal += v
+        wtotal += w
         # if v >= 100:
-            # pyautogui.press("P")
+        # pyautogui.press("P")
     return v, w
 
 
@@ -124,8 +125,9 @@ def reemplazar_wrist(mp_drawing, mp_holistic, image, lm, coor):
     coor[1] = int(lm.landmark[mp_holistic.HandLandmark.WRIST].y*height)
 
     mp_drawing.draw_landmarks(image, lm, mp_holistic.HAND_CONNECTIONS,
-                    mp_drawing.DrawingSpec(color=(0, 0, 0), thickness=2, circle_radius=3),
-                    mp_drawing.DrawingSpec(color=(219, 230, 101), thickness=2, circle_radius=2))
+                              mp_drawing.DrawingSpec(
+                                  color=(0, 0, 0), thickness=2, circle_radius=3),
+                              mp_drawing.DrawingSpec(color=(219, 230, 101), thickness=2, circle_radius=2))
     return image, coor
 
 
@@ -148,14 +150,14 @@ def proporciones(coor):
     return prop
 
 
-def image_process(frame, holistic, control,exer):
+def image_process(frame, holistic, control, exer):
     global t, coor, mp_drawing, mp_holistic, fvw, coor_mano
     # cambios de color y aplicar módulo holistic
     image = cv.cvtColor(frame, cv.COLOR_RGB2BGR)
     result = holistic.process(image)
     image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
     coor = np.zeros((len(puntos), 2))
-    coor_mano=np.zeros((len(p_mano), 2))
+    coor_mano = np.zeros((len(p_mano), 2))
     c = False
 
     # Landmarks
@@ -171,18 +173,18 @@ def image_process(frame, holistic, control,exer):
             # obtenemos coordenadas (S,E,W del brazo a rehabilitar)
             S, E, W = elbow_coordinate(lm_p.landmark, puntos[0:3])
             coor = coor_obtain(lm_p.landmark, np.linspace(1, 33, 33).astype(
-                int).tolist(), puntos)    
+                int).tolist(), puntos)
     except:
         pass
 
     if c == True:
         if lm is not None:
-            coor_mano=coor_obtain(lm.landmark, np.linspace(1, 20, 20).astype(
+            coor_mano = coor_obtain(lm.landmark, np.linspace(1, 20, 20).astype(
                 int).tolist(), p_mano)
             image, coor[0, :] = reemplazar_wrist(
                 mp_drawing, mp_holistic, image, lm, [coor[0, 0], coor[0, 1]])
 
-        #dibujar los semgentos y articulaciones
+        # dibujar los semgentos y articulaciones
         for i in range(len(coor)-2):
             cv.line(image, (int(coor[i, 0]), int(coor[i, 1])), (int(
                 coor[i+1, 0]), int(coor[i+1, 1])), (219, 230, 101), 2)
@@ -193,7 +195,7 @@ def image_process(frame, holistic, control,exer):
         cuadro, image = encuadrar(coor, image)
 
         if cuadro == True:
-            if exer==1: #ejercicio de flexion-extension
+            if exer == 1:  # ejercicio de flexion-extension
                 angle_calculate(S, E, W)
                 if fvw == 2:
                     vw_calculate()
@@ -211,54 +213,61 @@ def image_process(frame, holistic, control,exer):
                     vel[1]), (10, 30), cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2, cv.LINE_AA)
                 cv.putText(image, "A. Angular = {:.2f}".format(
                     ace[1]), (410, 30), cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2, cv.LINE_AA)
-                cv.putText(image, "Flexion y Extension", (225, 20), cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2, cv.LINE_AA)
+                cv.putText(image, "Flexion y Extension", (225, 20),
+                           cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2, cv.LINE_AA)
                 control = game_controller(control)
             else:
-                #ejercicio de supinación
-                image=sup_pro(coor_mano,E,W,image)  
-                cv.putText(image, "Supinacion y pronacion", (225, 20), cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2, cv.LINE_AA)
-                
+                # ejercicio de supinación
+                image = sup_pro(coor_mano, E, W, image)
+                cv.putText(image, "Supinacion y pronacion", (225, 20),
+                           cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2, cv.LINE_AA)
+
     return image, control
 
-def sup_pro(coor_mano,E,W,image):
-    global sp_vec, rep_sp,s
-    if s==0:
-        rep_sp=0
+
+def sup_pro(coor_mano, E, W, image):
+    global sp_vec, rep_sp, s
+    if s == 0:
+        rep_sp = 0
         sp_vec = np.array([-1, -1], dtype=float)
-        s=1
+        s = 1
     else:
-        if coor_mano[0,0]>coor_mano[1,0]: #si pulgar está a la derecha
-            sp=0
+        if coor_mano[0, 0] > coor_mano[1, 0]:  # si pulgar está a la derecha
+            sp = 0
         else:
-            sp=1
+            sp = 1
         sp_vec = np.flipud(sp_vec)
-        sp_vec[1]=sp
-        
-        m=pendiente(E,W)
-        if (m>4 or m<-4):
-            if np.sum(sp_vec)==1:
-                rep_sp+=1
+        sp_vec[1] = sp
+
+        m = pendiente(E, W)
+        if (m > 4 or m < -4):
+            if np.sum(sp_vec) == 1:
+                rep_sp += 1
+                pyautogui.press("M")
                 print(rep_sp)
         else:
             image = cv.rectangle(image, (0, 0), (640, 480), (3, 3, 252), 50)
-            cv.putText(image, "Posiciona tu antebrazo verticalmente",(135, 470), cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2, cv.LINE_AA)
-        
+            cv.putText(image, "Posiciona tu antebrazo verticalmente", (135, 470),
+                       cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2, cv.LINE_AA)
+
     return image
 
-def pendiente(E,W):
+
+def pendiente(E, W):
     try:
-        m=(W[1]-E[1])/(W[0]-E[0])
+        m = (W[1]-E[1])/(W[0]-E[0])
     except:
-        m=1000
+        m = 1000
     return m
-    
+
+
 def colormarco(is_all_true, image):
     if is_all_true == True:
         image = cv.rectangle(image, (0, 0), (640, 480), (0, 255, 0), 50)
     else:
         image = cv.rectangle(image, (0, 0), (640, 480), (3, 3, 252), 50)
         cv.putText(image, "Posicionate dentro del recuadro y en medio de la linea vertical",
-            (10, 470), cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2, cv.LINE_AA)
+                   (10, 470), cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2, cv.LINE_AA)
     return image
 
 
@@ -291,7 +300,8 @@ def encuadrar(coor, image):
             pi = True
         else:
             pi = False
-            cv.line(image, (vx, 100), (vx, 400),(219, 230, 101), 3)  # vertical
+            cv.line(image, (vx, 100), (vx, 400),
+                    (219, 230, 101), 3)  # vertical
 
     image = colormarco(pi, image)
 
@@ -304,7 +314,7 @@ def contador():
 
 
 def animate(i):
-    global capture,current_time,tlim,n,j,rep,rep_sp
+    global capture, current_time, tlim, n, j, rep, rep_sp
     try:
         contador()
         x_vals.append(angle)
@@ -320,20 +330,17 @@ def animate(i):
         plt.autoscale(enable=True, axis='x')
         plt.plot(y_vals, x_vals, "palevioletred", linewidth=3.0)
 
-        if current_time>=(tlim/2):
+        if current_time >= (tlim/2):
             pyautogui.press("H")
-            plt.close()
 
-        if current_time>=tlim and n==0:
-            n=1;
-            #write_base()
-            print(angtotal/j)
-            print(vtotal/j)
-            print(wtotal/j)
+        if current_time >= tlim and n == 0:
+            n = 1
+            # write_base()
+            plt.close()
+            pyautogui.press("F")
             cv.destroyWindow('camera')
             capture.release()
             sys.exit(0)
-
     except:
         pass
 
@@ -349,26 +356,28 @@ def show_image(image):
 
 
 def Imagen():
-    global fvw, width, height, capture, mp_drawing, mp_holistic,current_time,n
-    fvw = 2 #cada cuantos frames se calculará v y w
+    global fvw, width, height, capture, mp_drawing, mp_holistic, current_time, n
+    fvw = 2  # cada cuantos frames se calculará v y w
     control = 0
-    inicio=time.time()
+    inicio = time.time()
     with mp_holistic.Holistic(min_detection_confidence=0.8, min_tracking_confidence=0.8) as holistic:
-        while n==0:
-            current_time=time.time()-inicio
-            if current_time<=(tlim/2):
-                exer=1
+        while n == 0:
+            current_time = time.time()-inicio
+            if current_time <= (tlim/2):
+                exer = 1
             else:
-                exer=2
+                exer = 2
             frame = get_image(capture)
-            image, control = image_process(frame, holistic, control,exer)
+            image, control = image_process(frame, holistic, control, exer)
             show_image(image)
 
             if cv.waitKey(1) == ord('q'):
+                plt.close()
+                pyautogui.press("F")
                 capture.release()
                 cv.destroyAllWindows()
                 break
-        
+
 
 def rom_calculate(coor):
     global rom, angle, b
@@ -410,13 +419,13 @@ def avisos(image, t):
     global rt
     if t > 0 and t < rt[0]:
         cv.putText(image, " Mantente quieto", (235, 470),
-                cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2, cv.LINE_AA)
+                   cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2, cv.LINE_AA)
     if t >= rt[0] and t < rt[1]:
         cv.putText(image, "Flexiona el codo", (235, 470),
-                cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2, cv.LINE_AA)
+                   cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2, cv.LINE_AA)
     if t >= rt[1] and t < rt[2]:
         cv.putText(image, "Extiende el codo", (235, 470),
-                cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2, cv.LINE_AA)
+                   cv.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2, cv.LINE_AA)
     return image
 
 
@@ -463,7 +472,8 @@ def calibracion(holistic):
             pass
 
         show_image(image)
-        cv.waitKey(1) 
+        cv.waitKey(1)
+
 
 def cal():
     global mp_drawing, mp_holistic
@@ -484,15 +494,16 @@ def base_control():
 
 
 def write_base():
-    Db.insert_data(maxang, minang, angtotal/j, maxv, maxw, vtotal/j, wtotal/j, rep, rep_sp, user[0])
+    Db.insert_data(maxang, minang, angtotal/j, maxv, maxw,
+                   vtotal/j, wtotal/j, rep, rep_sp, user[0])
 
 
 def main():
-    global arm, rom, rom_a, puntos, width, height, capture, mp_drawing, mp_holistic, rt, u,tlim,p_mano
-    #base_control()
+    global arm, rom, rom_a, puntos, width, height, capture, mp_drawing, mp_holistic, rt, u, tlim, p_mano
+    # base_control()
     ####
-    arm=0
-    tlim=30;
+    arm = 0
+    tlim = 30
     ####
     mp_drawing = mp.solutions.drawing_utils
     mp_holistic = mp.solutions.holistic
@@ -507,9 +518,9 @@ def main():
         puntos = [15, 13, 11, 12, 1]
     else:
         puntos = [16, 14, 12, 11, 1]
-    p_mano=[2,17] #inicio de pulgar y de pinky
+    p_mano = [2, 17]  # inicio de pulgar y de pinky
     cal()
-    pyautogui.press("G") #para comenzar el juego
+    pyautogui.press("G")  # para comenzar el juego
     rom_a = rom[1]-rom[0]
     print(rom_a)
     plt.figure("Angle transition")
