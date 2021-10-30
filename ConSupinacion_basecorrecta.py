@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import threading
 from math import dist
-# Gimport Base
+import Base
 n = 0
 o = 0
 rep = 0
@@ -71,8 +71,8 @@ def vw_calculate():
         angtotal += angle
         vtotal += v
         wtotal += w
-        # if v >= 100:
-        # pyautogui.press("P")
+        if v >= 80:
+            pyautogui.press("P")
     return v, w
 
 
@@ -334,7 +334,7 @@ def animate(i):
 
         if current_time >= tlim and n == 0:
             n = 1
-            # write_base()
+            write_base()
             plt.close()
             pyautogui.press("F")
             cv.destroyWindow('camera')
@@ -493,15 +493,14 @@ def base_control():
 
 
 def write_base():
-    Db.insert_data(maxang, minang, angtotal/j, maxv, maxw,
-                   vtotal/j, wtotal/j, rep, rep_sp, user[0])
+    Db.insert_data(maxang, minang, (angtotal/j), maxv, maxw,
+                   (vtotal/j), (wtotal/j), rep, rep_sp, user[0])
 
 
 def main():
     global arm, rom, rom_a, puntos, width, height, capture, mp_drawing, mp_holistic, rt, u, tlim, p_mano
-    # base_control()
+    base_control()
     ####
-    arm = 0
     tlim = 30
     ####
     mp_drawing = mp.solutions.drawing_utils
