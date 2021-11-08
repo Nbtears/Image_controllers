@@ -12,7 +12,7 @@ class DataBase():
         self.cursor = self.connection.cursor()
 
     def get_user(self):
-        sql = 'SELECT id,user FROM sesion ORDER BY date DESC LIMIT 1'.format()
+        sql = 'SELECT id,user,duration FROM sesion ORDER BY date DESC LIMIT 1'.format()
         try:
             self.cursor.execute(sql)
             user = self.cursor.fetchone()
