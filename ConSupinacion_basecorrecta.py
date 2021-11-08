@@ -484,7 +484,7 @@ def base_control():
     global Db, arm, user, tlim
     Db = Base.DataBase()
     user = Db.get_user()
-    tlim = user[2] + 6
+    tlim = (user[2]*60) + 6
     arm_b = Db.show_arm(user[1])
     print(arm_b)
     if arm_b[0] == 'R':
@@ -502,7 +502,7 @@ def main():
     global arm, rom, rom_a, puntos, width, height, capture, mp_drawing, mp_holistic, rt, u, tlim, p_mano
     base_control()
     ####
-    #tlim = 30
+    print(tlim)
     ####
     mp_drawing = mp.solutions.drawing_utils
     mp_holistic = mp.solutions.holistic
@@ -522,7 +522,7 @@ def main():
     pyautogui.press("G")  # para comenzar el juego
     rom_a = rom[1]-rom[0]
     print(rom_a)
-    plt.figure("Angle transition")
+    f = plt.figure("Angle transition")
     t1 = threading.Thread(target=Imagen, name="t1")
     t1.start()
     ani = FuncAnimation(plt.gcf(), animate, interval=700)
